@@ -1,0 +1,22 @@
+import { IsString, IsOptional, IsBoolean, IsNumber } from 'class-validator';
+
+export class CreateCategoryDto {
+  @IsString()
+  name: string;
+
+  @IsOptional()
+  @IsString()
+  descripcion?: string;
+
+  @IsOptional()
+  @IsString()
+  icono?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  activa?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  orden?: number;
+}

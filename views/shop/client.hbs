@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda - Tattoo Shop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .client-navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .client-navbar .navbar-brand {
+            color: #2c3e50 !important;
+            font-weight: 700;
+        }
+        
+        .client-navbar .nav-link {
+            color: #2c3e50 !important;
+            font-weight: 600;
+        }
+        
+        .client-navbar .nav-link:hover {
+            color: #667eea !important;
+        }
+        
+        .client-navbar .btn-outline-danger {
+            color: #dc3545 !important;
+            border-color: #dc3545 !important;
+        }
+        
+        .client-navbar .btn-outline-danger:hover {
+            color: white !important;
+            background-color: #dc3545 !important;
+        }
+        
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            padding: 30px;
+            min-height: calc(100vh - 140px);
+        }
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        .product-image {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+        .product-info {
+            padding: 20px;
+        }
+        .product-price {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .add-to-cart-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        .add-to-cart-btn:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-2px);
+        }
+        .cart-badge {
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 12px;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+        }
+        .category-filter {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .category-btn {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 20px;
+            padding: 8px 15px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        .category-btn.active, .category-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        .search-box {
+            border-radius: 25px;
+            border: 2px solid #667eea;
+            padding: 10px 20px;
+        }
+        .search-box:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .user-welcome {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Client Navigation -->
+    <nav class="navbar navbar-expand-lg client-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/shop">
+                <i class="fas fa-star"></i> Tattoo Shop
+            </a>
+            
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item position-relative me-3">
+                    <a href="/cart" class="nav-link">
+                        <i class="fas fa-shopping-cart"></i> Carrito
+                        <span class="cart-badge" id="cart-count">0</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <form action="/auth/logout" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Welcome Message -->
+        <div class="user-welcome">
+            <h4><i class="fas fa-user"></i> ¡Bienvenido/a a nuestra tienda!</h4>
+            <p class="mb-0">Encuentra los mejores implementos para tatuaje profesional</p>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="category-filter">
+            <div class="row">
+                <div class="col-md-8">
+                    <h5><i class="fas fa-filter"></i> Filtrar por categoría:</h5>
+                    <button class="category-btn active" onclick="filterProducts('all')">
+                        <i class="fas fa-th"></i> Todos
+                    </button>
+                    <button class="category-btn" onclick="filterProducts('agujas')">
+                        <i class="fas fa-syringe"></i> Agujas
+                    </button>
+                    <button class="category-btn" onclick="filterProducts('tintas')">
+                        <i class="fas fa-palette"></i> Tintas
+                    </button>
+                    <button class="category-btn" onclick="filterProducts('maquinas')">
+                        <i class="fas fa-cog"></i> Máquinas
+                    </button>
+                    <button class="category-btn" onclick="filterProducts('cuidado')">
+                        <i class="fas fa-heart"></i> Cuidado
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control search-box" placeholder="Buscar productos..." onkeyup="searchProducts(this.value)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="row" id="products-grid">
+            <!-- Productos dinámicos se cargarán aquí -->
+            <div class="col-md-4 product-item" data-category="agujas">
+                <div class="product-card">
+                    <div class="product-image">
+                        <i class="fas fa-syringe"></i>
+                    </div>
+                    <div class="product-info">
+                        <h5>Agujas Premium Set</h5>
+                        <p class="text-muted">Set de agujas profesionales para líneas finas y sombreado</p>
+                        <div class="product-price">$25.99</div>
+                        <button class="add-to-cart-btn mt-3" onclick="addToCart(1, 'Agujas Premium Set', 25.99)">
+                            <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 product-item" data-category="tintas">
+                <div class="product-card">
+                    <div class="product-image">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <div class="product-info">
+                        <h5>Tinta Negra Premium</h5>
+                        <p class="text-muted">Tinta de alta calidad para tatuajes profesionales</p>
+                        <div class="product-price">$18.50</div>
+                        <button class="add-to-cart-btn mt-3" onclick="addToCart(2, 'Tinta Negra Premium', 18.50)">
+                            <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 product-item" data-category="maquinas">
+                <div class="product-card">
+                    <div class="product-image">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="product-info">
+                        <h5>Máquina Rotativa Pro</h5>
+                        <p class="text-muted">Máquina rotativa profesional para líneas y sombreado</p>
+                        <div class="product-price">$189.99</div>
+                        <button class="add-to-cart-btn mt-3" onclick="addToCart(3, 'Máquina Rotativa Pro', 189.99)">
+                            <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 product-item" data-category="cuidado">
+                <div class="product-card">
+                    <div class="product-image">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="product-info">
+                        <h5>Crema Cicatrizante</h5>
+                        <p class="text-muted">Crema especial para el cuidado post-tatuaje</p>
+                        <div class="product-price">$12.75</div>
+                        <button class="add-to-cart-btn mt-3" onclick="addToCart(4, 'Crema Cicatrizante', 12.75)">
+                            <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 product-item" data-category="agujas">
+                <div class="product-card">
+                    <div class="product-image">
+                        <i class="fas fa-syringe"></i>
+                    </div>
+                    <div class="product-info">
+                        <h5>Agujas de Sombreado</h5>
+                        <p class="text-muted">Set especializado para técnicas de sombreado</p>
+                        <div class="product-price">$32.00</div>
+                        <button class="add-to-cart-btn mt-3" onclick="addToCart(5, 'Agujas de Sombreado', 32.00)">
+                            <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 product-item" data-category="tintas">
+                <div class="product-card">
+                    <div class="product-image">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <div class="product-info">
+                        <h5>Set de Tintas de Colores</h5>
+                        <p class="text-muted">Colección de 12 tintas de colores vibrantes</p>
+                        <div class="product-price">$89.99</div>
+                        <button class="add-to-cart-btn mt-3" onclick="addToCart(6, 'Set de Tintas de Colores', 89.99)">
+                            <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-count').textContent = totalItems;
+        }
+
+        function addToCart(id, name, price) {
+            // Enviar producto al servidor
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productId: id.toString(),
+                    name: name,
+                    price: price,
+                    quantity: 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar localStorage también para la cuenta del carrito
+                    const item = {
+                        id: id,
+                        name: name,
+                        price: price,
+                        quantity: 1
+                    };
+                    
+                    const existingItem = cart.find(cartItem => cartItem.id === id);
+                    if (existingItem) {
+                        existingItem.quantity += 1;
+                    } else {
+                        cart.push(item);
+                    }
+                    
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartCount();
+                    
+                    // Mostrar notificación
+                    showNotification(`${name} agregado al carrito`);
+                } else {
+                    showNotification('Error al agregar el producto', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error al agregar el producto', 'error');
+            });
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            const alertClass = type === 'error' ? 'alert-danger' : 'alert-success';
+            const iconClass = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+            
+            notification.className = `alert ${alertClass} position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                <i class="${iconClass}"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function filterProducts(category) {
+            const products = document.querySelectorAll('.product-item');
+            const buttons = document.querySelectorAll('.category-btn');
+            
+            // Update active button
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Filter products
+            products.forEach(product => {
+                if (category === 'all' || product.dataset.category === category) {
+                    product.style.display = 'block';
+                } else {
+                    product.style.display = 'none';
+                }
+            });
+        }
+
+        function searchProducts(query) {
+            const products = document.querySelectorAll('.product-item');
+            const searchTerm = query.toLowerCase();
+            
+            products.forEach(product => {
+                const productName = product.querySelector('h5').textContent.toLowerCase();
+                const productDesc = product.querySelector('.text-muted').textContent.toLowerCase();
+                
+                if (productName.includes(searchTerm) || productDesc.includes(searchTerm)) {
+                    product.style.display = 'block';
+                } else {
+                    product.style.display = 'none';
+                }
+            });
+        }
+
+        // Sincronizar carrito con el servidor
+        function syncCartWithServer() {
+            fetch('/cart/sync', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar localStorage con los datos del servidor
+                    localStorage.setItem('cart', JSON.stringify(data.cartItems || []));
+                    cart = data.cartItems || [];
+                    updateCartCount();
+                }
+            })
+            .catch(error => {
+                console.error('Error al sincronizar carrito:', error);
+            });
+        }
+
+        // Limpiar localStorage del carrito
+        function clearLocalCart() {
+            localStorage.removeItem('cart');
+            cart = [];
+            updateCartCount();
+        }
+
+        // Función para limpiar el carrito del servidor también
+        function clearServerCart() {
+            fetch('/cart/clear', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    clearLocalCart();
+                    showNotification('Carrito limpiado correctamente');
+                }
+            })
+            .catch(error => {
+                console.error('Error al limpiar carrito:', error);
+            });
+        }
+
+        // Initialize cart count on page load and sync with server
+        syncCartWithServer();
+        updateCartCount();
+    </script>
+</body>
+</html>

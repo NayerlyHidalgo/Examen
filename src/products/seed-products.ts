@@ -1,0 +1,57 @@
+// Ejemplos de productos para tienda de tatuajes
+export const productosTatuajes = [
+  // Agujas RL
+  ...['1RL','3RL','5RL','7RL','9RL','11RL','13RL','15RL'].map(calibre => ({
+    nombre: `Aguja ${calibre} Round Liner`,
+    descripcion: `Aguja tipo RL calibre ${calibre} para líneas precisas`,
+    precio: 120,
+    stock: 100,
+    marca: 'EZ',
+    modelo: calibre,
+    especificaciones: 'Acero inoxidable, esterilizadas',
+    imagenes: ['aguja-rl.png'],
+    disponible: true,
+    destacado: calibre === '9RL' || calibre === '15RL',
+    descuento: calibre === '15RL' ? 10 : 0,
+    sku: `RL-${calibre}`,
+    peso: 5,
+    dimensiones: '12cm',
+    categoriaId: 'AGUJAS',
+  })),
+  // Tintas tonos básicos
+  ...['Negro','Blanco','Rojo','Azul','Verde','Amarillo','Naranja','Violeta','Rosa','Marrón'].map(tono => ({
+    nombre: `Tinta ${tono} Dynamic`,
+    descripcion: `Tinta para tatuaje tono ${tono} marca Dynamic`,
+    precio: 250,
+    stock: 50,
+    marca: 'Dynamic',
+    modelo: tono,
+    especificaciones: 'Botella 30ml, vegana',
+    imagenes: ['tinta-dynamic.png'],
+    disponible: true,
+    destacado: tono === 'Negro' || tono === 'Blanco',
+    descuento: 0,
+    sku: `TINTA-DYN-${tono.toUpperCase()}`,
+    peso: 40,
+    dimensiones: '10x3x3cm',
+    categoriaId: 'TINTAS',
+  })),
+  // Ejemplo de máquina
+  {
+    nombre: 'Máquina Rotativa Pen',
+    descripcion: 'Máquina rotativa tipo Pen para tatuar',
+    precio: 3500,
+    stock: 10,
+    marca: 'Dragonhawk',
+    modelo: 'Pen V2',
+    especificaciones: 'Motor silencioso, cuerpo aluminio',
+    imagenes: ['maquina-pen.png'],
+    disponible: true,
+    destacado: true,
+    descuento: 5,
+    sku: 'MAQ-PEN-V2',
+    peso: 120,
+    dimensiones: '15x3x3cm',
+    categoriaId: 'MAQUINAS',
+  }
+];

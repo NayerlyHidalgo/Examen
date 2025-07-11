@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/shop.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="shop-page">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-dragon"></i> 
+                <span>Tattoo Shop</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/shop">
+                            <i class="fas fa-store"></i> Tienda
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-th-large"></i> Categorías
+                        </a>
+                        <ul class="dropdown-menu">
+                            {{#each categories}}
+                            <li><a class="dropdown-item" href="/shop/category/{{id}}">{{name}}</a></li>
+                            {{/each}}
+                        </ul>
+                    </li>
+                </ul>
+                <div class="navbar-nav ms-auto">
+                    <div class="nav-item">
+                        <a class="nav-link" href="/cart">
+                            <i class="fas fa-shopping-cart"></i> Carrito
+                            <span class="badge bg-primary ms-1" id="cartCount">0</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" href="/admin/login">
+                            <i class="fas fa-user-shield"></i> Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <h1 class="hero-title">
+                            Los Mejores <span class="gradient-text">Implementos</span> para Tatuaje
+                        </h1>
+                        <p class="hero-subtitle">
+                            Encuentra todo lo que necesitas para tu arte. Máquinas, agujas, tintas y más, 
+                            con la mejor calidad y precios competitivos.
+                        </p>
+                        <div class="hero-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">{{totalProducts}}</span>
+                                <span class="stat-label">Productos</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">{{categories.length}}</span>
+                                <span class="stat-label">Categorías</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">500+</span>
+                                <span class="stat-label">Clientes</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image">
+                        <img src="/images/hero-tattoo.jpg" alt="Implementos de Tatuaje" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search and Filters -->
+    <section class="filters-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="search-bar">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" placeholder="Buscar productos..." 
+                                   value="{{filters.search}}" id="searchInput">
+                            <button class="btn btn-primary" type="button" id="searchButton">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="category-filter">
+                        <select class="form-select" id="categoryFilter">
+                            <option value="">Todas las categorías</option>
+                            {{#each categories}}
+                            <option value="{{id}}" {{#ifCond ../filters.category '==' id}}selected{{/ifCond}}>
+                                {{name}}
+                            </option>
+                            {{/each}}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    {{#if featuredProducts.length}}
+    <section class="featured-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Productos Destacados</h2>
+                <p class="section-subtitle">Los más vendidos y recomendados</p>
+            </div>
+            <div class="row">
+                {{#each featuredProducts}}
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="product-card featured">
+                        <div class="product-image">
+                            <img src="{{image}}" alt="{{name}}" class="img-fluid">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="btn btn-primary btn-sm" onclick="addToCart({{id}})">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                    <a href="/shop/product/{{id}}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="product-badge">Destacado</div>
+                        </div>
+                        <div class="product-info">
+                            <h5 class="product-name">{{name}}</h5>
+                            <p class="product-price">{{formatCurrency price}}</p>
+                            <div class="product-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span>(5.0)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+    </section>
+    {{/if}}
+
+    <!-- Products Grid -->
+    <section class="products-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Todos los Productos</h2>
+                <div class="results-info">
+                    <span>Mostrando {{products.length}} de {{totalProducts}} productos</span>
+                </div>
+            </div>
+
+            {{#if products.length}}
+            <div class="row" id="productsGrid">
+                {{#each products}}
+                <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="{{image}}" alt="{{name}}" class="img-fluid">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="btn btn-primary btn-sm" onclick="addToCart({{id}})">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                    <a href="/shop/product/{{id}}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            {{#if category}}
+                            <div class="product-category">{{category.name}}</div>
+                            {{/if}}
+                        </div>
+                        <div class="product-info">
+                            <h5 class="product-name">{{name}}</h5>
+                            <p class="product-description">{{truncate description 60}}</p>
+                            <p class="product-price">{{formatCurrency price}}</p>
+                            <div class="product-actions-bottom">
+                                <button class="btn btn-primary btn-sm" onclick="addToCart({{id}})">
+                                    <i class="fas fa-cart-plus"></i> Agregar
+                                </button>
+                                <a href="/shop/product/{{id}}" class="btn btn-outline-primary btn-sm">
+                                    Ver más
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+
+            <!-- Pagination -->
+            {{#if pagination.total}}
+            <nav aria-label="Products pagination">
+                <ul class="pagination justify-content-center">
+                    {{#if pagination.hasPrev}}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{sub pagination.current 1}}{{#if filters.category}}&category={{filters.category}}{{/if}}{{#if filters.search}}&search={{filters.search}}{{/if}}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {{/if}}
+                    
+                    {{#range 1 pagination.total}}
+                    <li class="page-item {{#ifCond this '==' ../pagination.current}}active{{/ifCond}}">
+                        <a class="page-link" href="?page={{this}}{{#if ../filters.category}}&category={{../filters.category}}{{/if}}{{#if ../filters.search}}&search={{../filters.search}}{{/if}}">
+                            {{this}}
+                        </a>
+                    </li>
+                    {{/range}}
+                    
+                    {{#if pagination.hasNext}}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{add pagination.current 1}}{{#if filters.category}}&category={{filters.category}}{{/if}}{{#if filters.search}}&search={{filters.search}}{{/if}}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {{/if}}
+                </ul>
+            </nav>
+            {{/if}}
+
+            {{else}}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <h3>No se encontraron productos</h3>
+                <p>Intenta con otros términos de búsqueda o categorías</p>
+                <a href="/shop" class="btn btn-primary">Ver todos los productos</a>
+            </div>
+            {{/if}}
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="footer-brand">
+                        <h5><i class="fas fa-dragon"></i> Tattoo Shop</h5>
+                        <p>Los mejores implementos para tatuaje profesional</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <h6>Enlaces</h6>
+                    <ul class="footer-links">
+                        <li><a href="/">Inicio</a></li>
+                        <li><a href="/shop">Tienda</a></li>
+                        <li><a href="/about">Acerca de</a></li>
+                        <li><a href="/contact">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h6>Contacto</h6>
+                    <p><i class="fas fa-phone"></i> +57 300 123 4567</p>
+                    <p><i class="fas fa-envelope"></i> info@tattooshop.com</p>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p>&copy; 2025 Tattoo Shop. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/shop.js"></script>
+</body>
+</html>

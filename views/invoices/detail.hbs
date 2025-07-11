@@ -1,0 +1,315 @@
+<!-- Detalle de Factura -->
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-receipt"></i> {{invoice.invoiceNumber}}</h1>
+            <div class="btn-group">
+                <a href="/web/invoices" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+                <a href="/web/invoices/{{invoice.id}}/print" class="btn btn-primary" target="_blank">
+                    <i class="fas fa-print"></i> Imprimir
+                </a>
+                {{#if (eq invoice.status 'pending')}}
+                <button class="btn btn-success" onclick="markAsPaid('{{invoice.id}}')">
+                    <i class="fas fa-check"></i> Marcar como Pagada
+                </button>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Información Principal -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información de la Factura</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Número de Factura:</strong> {{invoice.invoiceNumber}}</p>
+                        <p><strong>Estado:</strong> 
+                            <span class="badge {{getStatusClass invoice.status}}">
+                                {{getStatusText invoice.status}}
+                            </span>
+                        </p>
+                        <p><strong>Fecha de Emisión:</strong> {{formatDate invoice.issueDate}}</p>
+                        {{#if invoice.dueDate}}
+                        <p><strong>Fecha de Vencimiento:</strong> {{formatDate invoice.dueDate}}</p>
+                        {{/if}}
+                        {{#if invoice.paidDate}}
+                        <p><strong>Fecha de Pago:</strong> {{formatDate invoice.paidDate}}</p>
+                        {{/if}}
+                    </div>
+                    <div class="col-md-6">
+                        {{#if invoice.paymentMethod}}
+                        <p><strong>Método de Pago:</strong> {{invoice.paymentMethod}}</p>
+                        {{/if}}
+                        {{#if invoice.paymentReference}}
+                        <p><strong>Referencia de Pago:</strong> {{invoice.paymentReference}}</p>
+                        {{/if}}
+                        <p><strong>Creada:</strong> {{formatDate invoice.createdAt}}</p>
+                        <p><strong>Actualizada:</strong> {{formatDate invoice.updatedAt}}</p>
+                    </div>
+                </div>
+                
+                {{#if invoice.notes}}
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>Notas:</h6>
+                        <p class="text-muted">{{invoice.notes}}</p>
+                    </div>
+                </div>
+                {{/if}}
+                
+                {{#if invoice.terms}}
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>Términos y Condiciones:</h6>
+                        <p class="text-muted">{{invoice.terms}}</p>
+                    </div>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+
+        <!-- Productos -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-shopping-cart"></i> Productos</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unit.</th>
+                                <th>Descuento</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each invoice.details}}
+                            <tr>
+                                <td>
+                                    <strong>{{productName}}</strong>
+                                    {{#if productDescription}}
+                                    <br><small class="text-muted">{{productDescription}}</small>
+                                    {{/if}}
+                                    {{#if productSku}}
+                                    <br><small class="text-muted">SKU: {{productSku}}</small>
+                                    {{/if}}
+                                </td>
+                                <td>{{quantity}}</td>
+                                <td>${{unitPrice}}</td>
+                                <td>
+                                    {{#if discountPercentage}}
+                                    {{discountPercentage}}%
+                                    {{else}}
+                                    ${{discountAmount}}
+                                    {{/if}}
+                                </td>
+                                <td><strong>${{lineTotal}}</strong></td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Cliente y Totales -->
+    <div class="col-md-4">
+        <!-- Cliente -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user"></i> Cliente</h5>
+            </div>
+            <div class="card-body">
+                <h6>{{invoice.customerName}}</h6>
+                {{#if invoice.customerEmail}}
+                <p><i class="fas fa-envelope"></i> {{invoice.customerEmail}}</p>
+                {{/if}}
+                {{#if invoice.customerPhone}}
+                <p><i class="fas fa-phone"></i> {{invoice.customerPhone}}</p>
+                {{/if}}
+                {{#if invoice.customerDocument}}
+                <p><i class="fas fa-id-card"></i> {{invoice.customerDocument}}</p>
+                {{/if}}
+                {{#if invoice.customerAddress}}
+                <p><i class="fas fa-map-marker-alt"></i> {{invoice.customerAddress}}</p>
+                {{/if}}
+            </div>
+        </div>
+
+        <!-- Totales -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-calculator"></i> Totales</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <td>Subtotal:</td>
+                        <td class="text-end">${{invoice.subtotal}}</td>
+                    </tr>
+                    {{#if invoice.discountAmount}}
+                    <tr>
+                        <td>Descuento:</td>
+                        <td class="text-end text-danger">-${{invoice.discountAmount}}</td>
+                    </tr>
+                    {{/if}}
+                    {{#if invoice.taxAmount}}
+                    <tr>
+                        <td>Impuesto ({{invoice.taxPercentage}}%):</td>
+                        <td class="text-end">${{invoice.taxAmount}}</td>
+                    </tr>
+                    {{/if}}
+                    <tr class="border-top">
+                        <td><strong>Total:</strong></td>
+                        <td class="text-end"><strong class="text-primary">${{invoice.total}}</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-cog"></i> Acciones</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {{#if (eq invoice.status 'draft')}}
+                    <button class="btn btn-primary" onclick="editInvoice('{{invoice.id}}')">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    {{/if}}
+                    
+                    {{#if (eq invoice.status 'pending')}}
+                    <button class="btn btn-success" onclick="markAsPaid('{{invoice.id}}')">
+                        <i class="fas fa-check"></i> Marcar como Pagada
+                    </button>
+                    {{/if}}
+                    
+                    <button class="btn btn-info" onclick="duplicateInvoice('{{invoice.id}}')">
+                        <i class="fas fa-copy"></i> Duplicar
+                    </button>
+                    
+                    <button class="btn btn-warning" onclick="sendByEmail('{{invoice.id}}')">
+                        <i class="fas fa-envelope"></i> Enviar por Email
+                    </button>
+                    
+                    <a href="/web/invoices/{{invoice.id}}/print" class="btn btn-secondary" target="_blank">
+                        <i class="fas fa-print"></i> Imprimir
+                    </a>
+                    
+                    {{#if (eq invoice.status 'draft')}}
+                    <button class="btn btn-danger" onclick="deleteInvoice('{{invoice.id}}')">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para marcar como pagada -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Marcar como Pagada</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="paymentForm">
+                    <div class="mb-3">
+                        <label for="paymentMethod" class="form-label">Método de Pago</label>
+                        <select class="form-select" id="paymentMethod" required>
+                            <option value="">Seleccionar método</option>
+                            <option value="cash">Efectivo</option>
+                            <option value="credit_card">Tarjeta de Crédito</option>
+                            <option value="debit_card">Tarjeta de Débito</option>
+                            <option value="bank_transfer">Transferencia Bancaria</option>
+                            <option value="paypal">PayPal</option>
+                            <option value="other">Otro</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="paymentReference" class="form-label">Referencia de Pago</label>
+                        <input type="text" class="form-control" id="paymentReference" placeholder="Número de transacción, etc.">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="confirmPayment()">Confirmar Pago</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function editInvoice(id) {
+    window.location.href = `/web/invoices/${id}/edit`;
+}
+
+function duplicateInvoice(id) {
+    if (confirm('¿Crear una nueva factura basada en esta?')) {
+        window.location.href = `/web/invoices/create?duplicate=${id}`;
+    }
+}
+
+function sendByEmail(id) {
+    // Implementar envío por email
+    alert('Funcionalidad de envío por email en desarrollo');
+}
+
+function markAsPaid(invoiceId) {
+    currentInvoiceId = invoiceId;
+    const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
+    modal.show();
+}
+
+function confirmPayment() {
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const paymentReference = document.getElementById('paymentReference').value;
+    
+    if (!paymentMethod) {
+        alert('Debe seleccionar un método de pago');
+        return;
+    }
+    
+    // Aquí harías la llamada a la API
+    console.log('Marcar como pagada:', {
+        invoiceId: currentInvoiceId,
+        paymentMethod,
+        paymentReference
+    });
+    
+    // Simular éxito
+    alert('Factura marcada como pagada exitosamente');
+    window.location.reload();
+}
+
+function deleteInvoice(id) {
+    if (confirm('¿Está seguro que desea eliminar esta factura? Esta acción no se puede deshacer.')) {
+        // Aquí harías la llamada a la API
+        console.log('Eliminar factura:', id);
+        
+        // Simular éxito
+        alert('Factura eliminada exitosamente');
+        window.location.href = '/web/invoices';
+    }
+}
+
+let currentInvoiceId = null;
+</script>

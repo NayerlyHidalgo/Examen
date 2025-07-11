@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { margin: 0; }
+            .container { max-width: none; }
+        }
+        
+        .invoice-header {
+            border-bottom: 2px solid #333;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+        }
+        
+        .invoice-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .invoice-info {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .table-invoice {
+            margin-bottom: 2rem;
+        }
+        
+        .table-invoice th {
+            background-color: #333;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .totals-section {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .company-info {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .company-logo {
+            max-width: 150px;
+            height: auto;
+        }
+        
+        .footer-info {
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid #ccc;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-paid { background-color: #28a745; color: white; }
+        .status-pending { background-color: #ffc107; color: #212529; }
+        .status-draft { background-color: #6c757d; color: white; }
+        .status-cancelled { background-color: #dc3545; color: white; }
+        .status-overdue { background-color: #fd7e14; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Botón de impresión -->
+        <div class="no-print mb-3">
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i> Imprimir
+            </button>
+            <button class="btn btn-secondary" onclick="window.close()">
+                <i class="fas fa-times"></i> Cerrar
+            </button>
+        </div>
+
+        <!-- Encabezado de la empresa -->
+        <div class="company-info">
+            <img src="/images/logo.png" alt="Logo" class="company-logo" style="display: none;">
+            <h1 class="mb-1">TATTOO SHOP</h1>
+            <p class="mb-0">Implementos Profesionales para Tatuajes</p>
+            <p class="mb-0">📍 Dirección de la empresa | 📞 +1 234 567 8900 | 📧 info@tattooshop.com</p>
+        </div>
+
+        <!-- Encabezado de la factura -->
+        <div class="invoice-header">
+            <div class="row">
+                <div class="col-md-8">
+                    <h2 class="invoice-title">FACTURA</h2>
+                    <p class="mb-0"><strong>Número:</strong> {{invoice.invoiceNumber}}</p>
+                    <p class="mb-0"><strong>Fecha:</strong> {{formatDate invoice.issueDate}}</p>
+                    {{#if invoice.dueDate}}
+                    <p class="mb-0"><strong>Vencimiento:</strong> {{formatDate invoice.dueDate}}</p>
+                    {{/if}}
+                </div>
+                <div class="col-md-4 text-end">
+                    <span class="status-badge status-{{invoice.status}}">
+                        {{getStatusText invoice.status}}
+                    </span>
+                    {{#if invoice.paidDate}}
+                    <p class="mt-2 mb-0"><strong>Pagado:</strong> {{formatDate invoice.paidDate}}</p>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del cliente -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="invoice-info">
+                    <h5>Facturar a:</h5>
+                    <p class="mb-1"><strong>{{invoice.customerName}}</strong></p>
+                    {{#if invoice.customerEmail}}
+                    <p class="mb-1">{{invoice.customerEmail}}</p>
+                    {{/if}}
+                    {{#if invoice.customerPhone}}
+                    <p class="mb-1">{{invoice.customerPhone}}</p>
+                    {{/if}}
+                    {{#if invoice.customerDocument}}
+                    <p class="mb-1">{{invoice.customerDocumentType}}: {{invoice.customerDocument}}</p>
+                    {{/if}}
+                    {{#if invoice.customerAddress}}
+                    <p class="mb-0">{{invoice.customerAddress}}</p>
+                    {{/if}}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="invoice-info">
+                    <h5>Información de pago:</h5>
+                    {{#if invoice.paymentMethod}}
+                    <p class="mb-1"><strong>Método:</strong> {{invoice.paymentMethod}}</p>
+                    {{/if}}
+                    {{#if invoice.paymentReference}}
+                    <p class="mb-1"><strong>Referencia:</strong> {{invoice.paymentReference}}</p>
+                    {{/if}}
+                    {{#if invoice.terms}}
+                    <p class="mb-0"><strong>Términos:</strong> {{invoice.terms}}</p>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de productos -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-invoice">
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th class="text-center">Cantidad</th>
+                        <th class="text-end">Precio Unit.</th>
+                        <th class="text-end">Descuento</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each invoice.details}}
+                    <tr>
+                        <td>
+                            <strong>{{productName}}</strong>
+                            {{#if productDescription}}
+                            <br><small class="text-muted">{{productDescription}}</small>
+                            {{/if}}
+                            {{#if productSku}}
+                            <br><small class="text-muted">SKU: {{productSku}}</small>
+                            {{/if}}
+                        </td>
+                        <td class="text-center">{{quantity}}</td>
+                        <td class="text-end">${{unitPrice}}</td>
+                        <td class="text-end">
+                            {{#if discountPercentage}}
+                            {{discountPercentage}}%
+                            {{else}}
+                            ${{discountAmount}}
+                            {{/if}}
+                        </td>
+                        <td class="text-end"><strong>${{lineTotal}}</strong></td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totales -->
+        <div class="row">
+            <div class="col-md-8">
+                {{#if invoice.notes}}
+                <div class="mb-3">
+                    <h6>Notas:</h6>
+                    <p class="text-muted">{{invoice.notes}}</p>
+                </div>
+                {{/if}}
+            </div>
+            <div class="col-md-4">
+                <div class="totals-section">
+                    <table class="table table-borderless mb-0">
+                        <tr>
+                            <td>Subtotal:</td>
+                            <td class="text-end">${{invoice.subtotal}}</td>
+                        </tr>
+                        {{#if invoice.discountAmount}}
+                        <tr>
+                            <td>Descuento:</td>
+                            <td class="text-end text-danger">-${{invoice.discountAmount}}</td>
+                        </tr>
+                        {{/if}}
+                        {{#if invoice.taxAmount}}
+                        <tr>
+                            <td>Impuesto ({{invoice.taxPercentage}}%):</td>
+                            <td class="text-end">${{invoice.taxAmount}}</td>
+                        </tr>
+                        {{/if}}
+                        <tr class="border-top">
+                            <td><strong>TOTAL:</strong></td>
+                            <td class="text-end"><strong style="font-size: 1.2rem;">${{invoice.total}}</strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="footer-info">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Condiciones de pago:</strong></p>
+                    <p>Pago dentro de los 30 días posteriores a la fecha de facturación.</p>
+                    <p>Descuento del 2% por pago anticipado (10 días).</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Información legal:</strong></p>
+                    <p>RUC: 123456789001</p>
+                    <p>Autorización SRI: 1234567890</p>
+                    <p>Válido hasta: 31/12/2025</p>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 text-center">
+                    <p class="mb-0">¡Gracias por su compra! | Tattoo Shop - Implementos Profesionales</p>
+                    <p class="mb-0">www.tattooshop.com | Síguenos en redes sociales @TattooShopPro</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-imprimir cuando se carga la página
+        window.addEventListener('load', function() {
+            // Esperar un poco para que se cargue todo
+            setTimeout(function() {
+                // Solo auto-imprimir si se accede directamente a la URL de impresión
+                if (window.location.href.includes('/print')) {
+                    // window.print(); // Descomenta para auto-imprimir
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
