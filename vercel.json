@@ -1,0 +1,49 @@
+{
+  "version": 2,
+  "name": "tattoo-shop-frontend",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["views/**", "public/**"]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/css/(.*)",
+      "dest": "/public/css/$1"
+    },
+    {
+      "src": "/js/(.*)",
+      "dest": "/public/js/$1"
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "/public/images/$1"
+    },
+    {
+      "src": "/productos/(.*)",
+      "dest": "/src/main.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/src/main.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "DB_HOST": "@db-host",
+    "DB_PORT": "@db-port",
+    "DB_USER": "@db-user",
+    "DB_PASS": "@db-pass",
+    "DB_NAME": "@db-name",
+    "JWT_SECRET": "@jwt-secret",
+    "JWT_EXPIRES_IN": "@jwt-expires-in",
+    "MONGO_URI": "@mongo-uri",
+    "MAIL_USER": "@mail-user",
+    "MAIL_PASS": "@mail-pass",
+    "SESSION_SECRET": "@session-secret"
+  }
+}
