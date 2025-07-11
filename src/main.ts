@@ -10,16 +10,21 @@ const session = require('express-session');
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // Comentar ValidationPipe global temporalmente para evitar conflictos con auth
-  // app.useGlobalPipes(new ValidationPipe({ 
-  //   whitelist: true, 
-  //   forbidNonWhitelisted: true,
-  //   transform: true,
-  //   // Excluir rutas específicas de validación
-  //   skipMissingProperties: false,
-  //   // Permitir que algunos endpoints manejen validación manualmente
-  //   disableErrorMessages: false
-  // }));
+  // Configurar CORS para el dominio personalizado
+  app.enableCors({
+    origin: [
+      'http://tatto-shop.desarrollo-software.xyz',
+      'https://tatto-shop.desarrollo-software.xyz',
+      'http://localhost:3001',
+      'http://localhost:3000'
+    ],
+    credentials: true,
+  });
+
+  // Configurar prefijo global para todas las rutas
+  app.setGlobalPrefix('productos');
+
+  // Filtro global de excepciones
   app.useGlobalFilters(new GlobalHttpExceptionFilter());
 
   // Configurar sesiones
@@ -29,7 +34,7 @@ async function bootstrap() {
       resave: false,
       saveUninitialized: false,
       cookie: {
-        secure: false, // Set to true in production with HTTPS
+        secure: process.env.NODE_ENV === 'production' && process.env.USE_HTTPS === 'true',
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
       },
@@ -42,15 +47,20 @@ async function bootstrap() {
   // Configurar motor de plantillas Handlebars
   setupHandlebars(app);
   
-  app.enableCors();
   const port = process.env.PORT || 3001;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   
-  console.log(`🚀 Servidor iniciado en http://localhost:${port}`);
-  console.log(`🏠 Página de inicio: http://localhost:${port}/`);
-  console.log(`🛒 Tienda: http://localhost:${port}/shop`);
-  console.log(`📊 Dashboard de facturación: http://localhost:${port}/web/invoices`);
-  console.log(`🔑 Login unificado: http://localhost:${port}/auth/login`);
-  console.log(`🔗 API Documentation: http://localhost:${port}/api`);
+  console.log(`🚀 Servidor iniciado en puerto ${port}`);
+  console.log(`🌐 Dominio personalizado: http://tatto-shop.desarrollo-software.xyz/productos`);
+  console.log(`🏠 Página principal: http://tatto-shop.desarrollo-software.xyz/productos/`);
+  console.log(`🛒 Tienda pública: http://tatto-shop.desarrollo-software.xyz/productos/tienda`);
+  console.log(`🛒 Carrito: http://tatto-shop.desarrollo-software.xyz/productos/cart`);
+  console.log(`🔑 Login: http://tatto-shop.desarrollo-software.xyz/productos/auth/login`);
+  console.log(`📊 Admin: http://tatto-shop.desarrollo-software.xyz/productos/admin`);
+  console.log(`🔗 API: http://tatto-shop.desarrollo-software.xyz/productos/api/health`);
+  console.log(`📧 Contact: http://tatto-shop.desarrollo-software.xyz/productos/contact`);
+  console.log(`ℹ️ About: http://tatto-shop.desarrollo-software.xyz/productos/about`);
+  console.log(`🌐 Entorno: ${process.env.NODE_ENV || 'development'}`);
 }
+
 bootstrap();
