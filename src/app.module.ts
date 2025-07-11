@@ -1,5 +1,6 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -17,6 +18,8 @@ import { HomeModule } from './home/home.module';
 import { ShopModule } from './shop/shop.module';
 import { PublicShopModule } from './public-shop/public-shop.module';
 import { AdminModule } from './admin/admin.module';
+import { LogsModule } from './logs/logs.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { AdminAuthMiddleware } from './auth/admin-auth.middleware';
 import { WebAuthMiddleware } from './auth/web-auth.middleware';
 
@@ -50,6 +53,16 @@ import { WebAuthMiddleware } from './auth/web-auth.middleware';
       }),
       inject: [ConfigService],
     }),
+    // Configuración de MongoDB
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGO_URI'),
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }),
+      inject: [ConfigService],
+    }),
     AuthModule,
     UsersModule,
     CategoriesModule,
@@ -63,6 +76,8 @@ import { WebAuthMiddleware } from './auth/web-auth.middleware';
     ShopModule,
     PublicShopModule,
     AdminModule,
+    LogsModule,
+    NotificationsModule,
   ],
   controllers: [AppController, MainController],
   providers: [AppService],

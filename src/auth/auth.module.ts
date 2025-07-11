@@ -6,7 +6,7 @@ import { RegistrationMiddleware } from './registration.middleware';
 import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-//import { JwtStrategy } from './jwt.strategy';
+import { JwtStrategy } from './jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
@@ -24,7 +24,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
   controllers: [AuthController, AuthWebController],
-  providers: [AuthService, RegistrationMiddleware],
+  providers: [AuthService, RegistrationMiddleware, JwtStrategy],
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
