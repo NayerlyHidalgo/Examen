@@ -26,7 +26,7 @@ async function bootstrap() {
   // Prefijo global para todas las rutas API
   app.setGlobalPrefix('api');
 
-  const port = process.env.PORT || 3001;
+  const port = process.env.PORT || 3102;
   await app.listen(port);
   
   console.log(`🚀 API REST pura corriendo en: http://localhost:${port}/api`);
