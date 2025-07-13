@@ -1,10 +1,9 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MainController } from './main.controller';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { CategoriesModule } from './categories/categories.module';
@@ -14,55 +13,28 @@ import { CartModule } from './cart/cart.module';
 import { ProductsModule } from './products/products.module';
 import { ReviewModule } from './review/review.module';
 import { InvoicesModule } from './invoices/invoices.module';
-import { HomeModule } from './home/home.module';
-import { ShopModule } from './shop/shop.module';
-import { PublicShopModule } from './public-shop/public-shop.module';
 import { AdminModule } from './admin/admin.module';
-import { LogsModule } from './logs/logs.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { LogsModule } from './logs/logs.module';
 import { AdminAuthMiddleware } from './auth/admin-auth.middleware';
-import { WebAuthMiddleware } from './auth/web-auth.middleware';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ 
-      isGlobal: true,
-      envFilePath: ['.env', '.env.production'],
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT || '5432', 10),
+      username: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true,
+      ssl: {
+        rejectUnauthorized: false, // Adjust based on your SSL configuration
+      }
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT', 5432),
-        username: configService.get<string>('DB_USER'),
-        password: configService.get<string>('DB_PASS'),
-        database: configService.get<string>('DB_NAME'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: configService.get<string>('NODE_ENV') !== 'production',
-        ssl: {
-          rejectUnauthorized: false,
-        },
-        logging: configService.get<string>('NODE_ENV') !== 'production',
-        // Configuraciones adicionales para Neon
-        extra: {
-          ssl: {
-            rejectUnauthorized: false,
-          },
-        },
-      }),
-      inject: [ConfigService],
-    }),
-    // Configuración de MongoDB
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGO_URI'),
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }),
-      inject: [ConfigService],
-    }),
+    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/tattoo-shop'),
     AuthModule,
     UsersModule,
     CategoriesModule,
@@ -72,34 +44,26 @@ import { WebAuthMiddleware } from './auth/web-auth.middleware';
     ReviewModule,
     ProductsModule,
     InvoicesModule,
-    HomeModule,
-    ShopModule,
-    PublicShopModule,
     AdminModule,
-    LogsModule,
     NotificationsModule,
+    LogsModule,
   ],
-  controllers: [AppController, MainController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    // Aplicar middleware de autenticación a todas las rutas protegidas
-    consumer
-      .apply(AdminAuthMiddleware)
-      .exclude(
-        'auth/login', 
-        'auth/register', 
-        'auth/logout',
-        'tienda',
-        'tienda/(.*)',
-        'api/(.*)',
-        'css/(.*)',
-        'js/(.*)',
-        'images/(.*)',
-        'favicon.ico',
-        'debug'
-      )
-      .forRoutes('*');
+    // Middleware de autenticación temporalmente deshabilitado
+    // Solo se aplicará a rutas API cuando sea necesario
+    // consumer
+    //   .apply(AdminAuthMiddleware)
+    //   .exclude(
+    //     'api/auth/login', 
+    //     'api/auth/register', 
+    //     'api/auth/logout',
+    //     'api/health',
+    //     'api/logs/test'
+    //   )
+    //   .forRoutes('api/*');
   }
 }

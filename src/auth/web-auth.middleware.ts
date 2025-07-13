@@ -4,6 +4,11 @@ import { Request, Response, NextFunction } from 'express';
 @Injectable()
 export class WebAuthMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
+    // Middleware temporalmente deshabilitado para API REST pura
+    next();
+    return;
+    
+    /* CÓDIGO ANTERIOR COMENTADO - BASADO EN SESIONES
     // Check if user is authenticated
     const session = req.session as any;
     if (!session || !session.user) {
@@ -20,5 +25,6 @@ export class WebAuthMiddleware implements NestMiddleware {
     }
     
     next();
+    */
   }
 }

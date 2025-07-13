@@ -1,7 +1,7 @@
 import {
   Controller, Get, Post, Put, Delete, Body, Param,
   Query, BadRequestException, NotFoundException,
-  UseInterceptors, UploadedFile, UseGuards,
+  UseInterceptors, UploadedFile,
   InternalServerErrorException
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -9,27 +9,21 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SuccessResponseDto } from '../common/dto/response.dto';
 import { Pagination } from 'nestjs-typeorm-paginate';
-import { User, UserRole } from './user.entity';
+import { User } from './user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('users')
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Post()
-  @Roles(UserRole.ADMIN)
   async create(@Body() dto: CreateUserDto) {
     const user = await this.usersService.create(dto);
     return new SuccessResponseDto('User created successfully', user);
   }
 
   @Get()
-  @Roles(UserRole.ADMIN)
   async findAll(
     @Query('page') page = 1,
     @Query('limit') limit = 10,
@@ -45,7 +39,6 @@ export class UsersController {
   }
 
   @Get(':id')
-  @Roles(UserRole.ADMIN, UserRole.CUSTOMER)
   async findOne(@Param('id') id: string) {
     const user = await this.usersService.findOne(id);
     if (!user) throw new NotFoundException('User not found');
@@ -53,7 +46,6 @@ export class UsersController {
   }
 
   @Put(':id')
-  @Roles(UserRole.ADMIN)
   async update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
     const user = await this.usersService.update(id, dto);
     if (!user) throw new NotFoundException('User not found');

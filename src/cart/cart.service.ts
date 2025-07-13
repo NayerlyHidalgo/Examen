@@ -37,6 +37,11 @@ export class CartService {
         activo: true,
       });
     }
+    
+    if (!cart) {
+      throw new Error('Carrito no encontrado');
+    }
+    
     let items = cart.items || [];
     let item = items.find(i => i.productoId === productoId);
     if (item) {

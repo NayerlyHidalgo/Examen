@@ -4,8 +4,9 @@ import { Request, Response, NextFunction } from 'express';
 @Injectable()
 export class AdminAuthMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    console.log('AdminAuthMiddleware - Path:', req.path);
-    console.log('AdminAuthMiddleware - Session:', req.session);
+    // Middleware temporalmente deshabilitado para API REST pura
+    // console.log('AdminAuthMiddleware - Path:', req.path);
+    // console.log('AdminAuthMiddleware - Session:', req.session);
     
     // Rutas públicas que no requieren autenticación
     const publicPaths = [
@@ -32,6 +33,11 @@ export class AdminAuthMiddleware implements NestMiddleware {
     }
 
     // Verificar si el usuario está autenticado
+    // Para API REST pura, simplemente pasamos al siguiente middleware
+    next();
+    return;
+    
+    /* CÓDIGO ANTERIOR COMENTADO - BASADO EN SESIONES
     const session = req.session as any;
     const isAuthenticated = session?.user || session?.adminAuthenticated;
     
@@ -54,5 +60,6 @@ export class AdminAuthMiddleware implements NestMiddleware {
     // Usuario autenticado, continuar
     console.log('User authenticated, continuing');
     next();
+    */
   }
 }

@@ -1,12 +1,11 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { AuthWebController } from './auth-web.controller';
 import { RegistrationMiddleware } from './registration.middleware';
 import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './jwt.strategy';
+//import { JwtStrategy } from './jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
@@ -23,8 +22,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AuthController, AuthWebController],
-  providers: [AuthService, RegistrationMiddleware, JwtStrategy],
+  controllers: [AuthController],
+  providers: [AuthService, RegistrationMiddleware],
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
